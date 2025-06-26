@@ -1,56 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Online JSON to Excel Converter | Vikram Kumar Sinha</title>
-  <meta name="description" content="Free online tool to convert JSON files to Excel (.xlsx) format instantly. Built by Vikram Kumar Sinha for public use. No signup required.">
-  <meta name="keywords" content="json to excel, json converter, export json to xlsx, vikram kumar sinha, free json tool, online json to excel converter">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JSON to Excel Converter | Vikram Kumar Sinha</title>
+  <meta name="description" content="Convert JSON to Excel (.xlsx) instantly with this free online tool by Vikram Kumar Sinha. Fast, browser-based, and private.">
+  <meta name="keywords" content="JSON to Excel, JSON to XLSX, convert JSON file, online JSON tool, Vikram Kumar Sinha">
   <meta name="author" content="Vikram Kumar Sinha">
-  <meta property="og:title" content="JSON to Excel Converter by Vikram Kumar Sinha">
-  <meta property="og:description" content="Upload your JSON file and instantly download the Excel version. Fast, secure, and browser-based. No ads.">
-  <meta property="og:url" content="https://yourusername.github.io/json-to-excel/">
-  <meta property="og:type" content="website">
-  <meta name="robots" content="index, follow">
 
-  <link rel="canonical" href="https://yourusername.github.io/json-to-excel/">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 2em;
-      max-width: 600px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 500px;
       margin: auto;
-      background-color: #f9f9f9;
-    }
-    h1, h2 {
+      padding: 2em;
+      margin-top: 5vh;
+      background: white;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
       text-align: center;
     }
-    input[type="file"], button {
-      display: block;
-      margin: 1em auto;
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 0.5em;
+    }
+
+    #dropzone {
+      border: 2px dashed #aaa;
+      border-radius: 10px;
+      padding: 2em;
+      background: #fafafa;
+      cursor: pointer;
+      margin: 1em 0;
+    }
+
+    #dropzone.hover {
+      background: #eef;
+      border-color: #66f;
+    }
+
+    button {
       padding: 10px 20px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
     }
+
+    button:hover {
+      background-color: #005ea0;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
     footer {
+      margin-top: auto;
       text-align: center;
-      margin-top: 3em;
       font-size: 0.9em;
-      color: #666;
+      padding: 2em 1em;
+      color: #888;
+    }
+
+    .dark {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    .dark .container {
+      background-color: #2d2d2d;
+      color: #f0f0f0;
+    }
+
+    .dark #dropzone {
+      background: #3a3a3a;
+      border-color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>JSON to Excel Converter</h1>
-  <h2>By Vikram Kumar Sinha</h2>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
-  <input type="file" id="jsonFile" accept=".json">
-  <button onclick="convertJsonToExcel()">Convert & Download</button>
+  <div class="container">
+    <h1>JSON to Excel Converter</h1>
+    <p>Upload a <strong>.json</strong> file below to convert it into an Excel file.</p>
+
+    <div id="dropzone" onclick="document.getElementById('jsonInput').click()">
+      Drop your JSON file here or click to upload
+    </div>
+
+    <input type="file" id="jsonInput" accept=".json" style="display: none" />
+    <button onclick="convertJsonToExcel()">Convert & Download</button>
+  </div>
+
+  <footer>&copy; 2025 Vikram Kumar Sinha. All rights reserved.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    let file;
 
-  <footer>
-    &copy; 2025 Vikram Kumar Sinha | Built for public use with no data collected.
-  </footer>
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('hover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('hover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('hover');
+      file = e.dataTransfer.files[0];
+    });
+
+    document.getElementById('jsonInput').addEventListener('change', (e) => {
+      file = e.target.files[0];
+    });
+
+    function convertJsonToExcel() {
+      if (!file) {
+        alert("Please upload a JSON file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const json = JSON.parse(e.target.result);
+          const data = Array.isArray(json) ? json : [json];
+          const worksheet = XLSX.utils.json_to_sheet(data);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+          XLSX.writeFile(workbook, "output.xlsx");
+        } catch (err) {
+          alert("Invalid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+  </script>
 </body>
 </html>
