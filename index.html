@@ -107,9 +107,8 @@
 <body>
   <div class="card">
     <h1>JSON to Excel Converter</h1>
-    <p>By Vikram Kumar Sinha</p>
+    <p>By Vikram Kumar Sinha</p></br></br>
     <p>Upload your <strong>.json</strong> file below to convert it into an Excel file.</p>
-
     <div id="dropzone" onclick="document.getElementById('jsonInput').click()">
       Drop your file here or click to browse
     </div>
@@ -118,7 +117,7 @@
     <button onclick="convertJsonToExcel()">Convert & Download</button>
   </div>
 
-  <footer> &copy; 2025 Vikram Kumar Sinha | Built for public use with no data collected. </footer>
+  <footer><strong> &copy; 2025 Vikram Kumar Sinha | Built for public use with no data collected. </strong> </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
@@ -158,7 +157,7 @@
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-          XLSX.writeFile(workbook, "output.xlsx");
+          XLSX.writeFile(workbook, "json-excel-output.xlsx");
         } catch (err) {
           alert("Invalid JSON file.");
         }
