@@ -8,7 +8,7 @@ A free, browser-based tool to convert JSON files into Excel (.xlsx) format insta
 - Created and maintained by Vikram Kumar Sinha
 
 ## Live Demo
-[https://yourusername.github.io/json-to-excel/](https://yourusername.github.io/json-to-excel/)
+[(https://thevikramsinha.github.io/json-to-excel/)](https://thevikramsinha.github.io/json-to-excel/)
 
 ## Usage
 1. Upload your JSON file
