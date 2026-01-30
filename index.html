@@ -4,16 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JSON to Excel Converter | Vikram Kumar Sinha</title>
-  <meta name="title" content="JSON to Excel Converter | Vikram Kumar Sinha">
-  <meta name="description" content="Free online JSON to Excel converter by Vikram Kumar Sinha. Upload your JSON file and download it as an Excel spreadsheet instantly. No login, secure, and browser-based.">
-  <meta name="keywords" content="JSON to Excel, JSON to XLSX, convert JSON online, export JSON to Excel, free JSON to Excel tool, JSON file to spreadsheet, no-code JSON converter, Vikram Kumar Sinha, JSON Excel tool India">
-  <meta name="author" content="Vikram Kumar Sinha">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://thevikramsinha.github.io/json-to-excel/">
-  <meta property="og:title" content="JSON to Excel Converter | Vikram Kumar Sinha">
-  <meta property="og:description" content="Upload your JSON and download Excel instantly. A secure, fast, browser-based tool by Vikram Kumar Sinha.">
-  <meta property="og:image" content="https://thevikramsinha.github.io/json-to-excel/cover.jpg">
-  <link rel="canonical" href="https://thevikramsinha.github.io/json-to-excel/">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,9 +13,8 @@
       color: #fff;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       padding: 2em;
     }
     .card {
@@ -34,30 +23,31 @@
       border-radius: 20px;
       padding: 2.5em;
       width: 100%;
-      max-width: 600px;
+      max-width: 800px; /* Widened for preview */
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
       text-align: center;
+      margin-bottom: 2em;
     }
     h1 { font-size: 1.8em; margin-bottom: 0.2em; color: #4a5568; }
     .author-tag { color: #764ba2; font-weight: 600; margin-bottom: 2em; display: block; }
     
     #dropzone {
       border: 2px dashed #764ba2;
-      padding: 3em 2em;
+      padding: 2em;
       border-radius: 12px;
       background: #f9f9f9;
       cursor: pointer;
       margin-bottom: 1.5em;
       transition: all 0.3s;
     }
-    #dropzone.hover { background: #e0d7f3; border-style: solid; }
+    #dropzone.hover { background: #e0d7f3; }
     #dropzone.file-set { border-color: #48bb78; background: #f0fff4; }
     
-    .file-info { font-size: 0.9em; color: #718096; margin-top: 10px; font-style: italic; }
+    .file-info { font-size: 0.8em; color: #718096; margin-top: 5px; }
     
     input[type="file"] { display: none; }
     
-    /* Progress Bar Styles */
+    /* Progress Bar */
     .progress-container {
       width: 100%;
       height: 8px;
@@ -67,12 +57,25 @@
       display: none;
       overflow: hidden;
     }
-    .progress-bar {
-      width: 0%;
-      height: 100%;
-      background: #667eea;
-      transition: width 0.2s;
+    .progress-bar { width: 0%; height: 100%; background: #667eea; transition: width 0.2s; }
+
+    /* Preview Table Styles */
+    #previewSection {
+      display: none;
+      margin-top: 2em;
+      text-align: left;
+      animation: fadeIn 0.5s ease;
     }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+    th { background: #f7fafc; color: #4a5568; padding: 12px; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 10px 12px; border-bottom: 1px solid #edf2f7; color: #718096; }
 
     button {
       background: #667eea;
@@ -84,12 +87,13 @@
       border-radius: 8px;
       cursor: pointer;
       width: 100%;
-      transition: transform 0.2s, background 0.3s;
+      transition: all 0.3s;
     }
-    button:hover { background: #5a67d8; transform: translateY(-1px); }
-    button:disabled { background: #cbd5e0; cursor: not-allowed; }
+    button:hover { background: #5a67d8; }
+    button:disabled { background: #cbd5e0; }
 
-    footer { margin-top: 2em; font-size: 0.85em; color: rgba(255,255,255,0.8); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    footer { font-size: 0.85em; color: rgba(255,255,255,0.8); padding-bottom: 2em; }
   </style>
 </head>
 <body>
@@ -104,98 +108,112 @@
 
     <input type="file" id="jsonInput" accept=".json" />
     
+    <div id="previewSection">
+      <p style="font-weight: 600; font-size: 0.9em; color: #4a5568;">Data Stream Preview (First 5 Rows):</p>
+      <div class="table-container">
+        <table id="previewTable"><thead><tr id="tableHead"></tr></thead><tbody id="tableBody"></tbody></table>
+      </div>
+    </div>
+
     <div class="progress-container" id="progContainer">
       <div class="progress-bar" id="progBar"></div>
     </div>
 
-    <button id="convertBtn" onclick="convertJsonToExcel()">Convert & Download</button>
+    <button id="convertBtn" style="margin-top: 1.5em;" onclick="convertJsonToExcel()">Convert & Download</button>
   </div>
 
-  <footer>&copy; 2026 Vikram Kumar Sinha | Secure Browser-Based Conversion</footer>
+  <footer>&copy; 2026 Vikram Kumar Sinha | Built for secure public use.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     let selectedFile;
-    const dropzone = document.getElementById('dropzone');
-    const dropzoneText = document.getElementById('dropzoneText');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const progContainer = document.getElementById('progContainer');
-    const progBar = document.getElementById('progBar');
-    const convertBtn = document.getElementById('convertBtn');
+    let jsonData = null;
 
     function handleFile(file) {
-      if (file && file.type === "application/json" || file.name.endsWith('.json')) {
+      if (file && (file.type === "application/json" || file.name.endsWith('.json'))) {
         selectedFile = file;
-        dropzone.classList.add('file-set');
-        dropzoneText.innerText = "File Locked Successfully";
-        fileNameDisplay.innerText = `Target: ${file.name} (${(file.size/1024).toFixed(2)} KB)`;
-      } else {
-        alert("Please upload a valid .json file");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const raw = JSON.parse(e.target.result);
+            jsonData = Array.isArray(raw) ? raw : [raw];
+            updateUIWithFileData(file.name, file.size);
+            generatePreview(jsonData);
+          } catch (err) {
+            alert("Invalid JSON structure.");
+          }
+        };
+        reader.readAsText(file);
       }
     }
 
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('hover'); });
-    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('hover'); });
-    dropzone.addEventListener('drop', (e) => {
+    function updateUIWithFileData(name, size) {
+      document.getElementById('dropzone').classList.add('file-set');
+      document.getElementById('dropzoneText').innerText = "File Analyzed";
+      document.getElementById('fileNameDisplay').innerText = `${name} (${(size/1024).toFixed(2)} KB)`;
+    }
+
+    function generatePreview(data) {
+      const head = document.getElementById('tableHead');
+      const body = document.getElementById('tableBody');
+      const section = document.getElementById('previewSection');
+      
+      head.innerHTML = ''; body.innerHTML = '';
+      if (data.length === 0) return;
+
+      // Extract Headers
+      const keys = Object.keys(data[0]);
+      keys.forEach(key => {
+        const th = document.createElement('th');
+        th.innerText = key;
+        head.appendChild(th);
+      });
+
+      // Extract Rows (Max 5)
+      data.slice(0, 5).forEach(row => {
+        const tr = document.createElement('tr');
+        keys.forEach(key => {
+          const td = document.createElement('td');
+          td.innerText = typeof row[key] === 'object' ? '[Object]' : row[key];
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+
+      section.style.display = 'block';
+    }
+
+    // Standard Listeners
+    document.getElementById('dropzone').addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('hover'); });
+    document.getElementById('dropzone').addEventListener('dragleave', (e) => e.currentTarget.classList.remove('hover'));
+    document.getElementById('dropzone').addEventListener('drop', (e) => {
       e.preventDefault();
-      dropzone.classList.remove('hover');
+      e.currentTarget.classList.remove('hover');
       handleFile(e.dataTransfer.files[0]);
     });
-
-    document.getElementById('jsonInput').addEventListener('change', (e) => {
-      handleFile(e.target.files[0]);
-    });
+    document.getElementById('jsonInput').addEventListener('change', (e) => handleFile(e.target.files[0]));
 
     function convertJsonToExcel() {
-      if (!selectedFile) {
-        alert("Protocol Error: No JSON module detected.");
-        return;
-      }
-
-      convertBtn.disabled = true;
-      progContainer.style.display = 'block';
-      let width = 0;
+      if (!jsonData) return alert("No data to convert.");
       
-      const interval = setInterval(() => {
-        if (width >= 90) clearInterval(interval);
-        width += 5;
-        progBar.style.width = width + '%';
-      }, 50);
+      const btn = document.getElementById('convertBtn');
+      const pBar = document.getElementById('progBar');
+      const pCont = document.getElementById('progContainer');
+      
+      btn.disabled = true;
+      pCont.style.display = 'block';
+      pBar.style.width = '100%';
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          const json = JSON.parse(e.target.result);
-          const data = Array.isArray(json) ? json : [json];
-          
-          const worksheet = XLSX.utils.json_to_sheet(data);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Export");
-          
-          XLSX.writeFile(workbook, `${selectedFile.name.replace('.json', '')}_Export.xlsx`);
-          
-          progBar.style.width = '100%';
-          setTimeout(() => {
-            alert("Conversion Complete.");
-            resetUI();
-          }, 500);
-        } catch (err) {
-          alert("Critical Error: Invalid JSON structure.");
-          resetUI();
-        }
-      };
-      reader.readAsText(selectedFile);
-    }
-
-    function resetUI() {
-      progContainer.style.display = 'none';
-      progBar.style.width = '0%';
-      convertBtn.disabled = false;
-      selectedFile = null;
-      dropzone.classList.remove('file-set');
-      dropzoneText.innerText = "Drop your JSON file here or click to browse";
-      fileNameDisplay.innerText = "";
-      document.getElementById('jsonInput').value = "";
+      setTimeout(() => {
+        const worksheet = XLSX.utils.json_to_sheet(jsonData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Vikram_Data_Export");
+        XLSX.writeFile(workbook, `${selectedFile.name.replace('.json', '')}_Export.xlsx`);
+        
+        btn.disabled = false;
+        pCont.style.display = 'none';
+        pBar.style.width = '0%';
+      }, 800);
     }
   </script>
 </body>
